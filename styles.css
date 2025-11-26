@@ -231,6 +231,11 @@ main {
     display: none;
 }
 
+/* Garantir que o botão de captura não apareça */
+#captureBtn {
+    display: none !important;
+}
+
 .glasses-overlay {
     position: absolute;
     top: 0;

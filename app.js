@@ -123,6 +123,12 @@ function syncMobileControls() {
 
 // Inicialização
 async function init() {
+    // Remover botão de captura caso exista (cache do navegador)
+    const captureBtn = document.getElementById('captureBtn');
+    if (captureBtn) {
+        captureBtn.remove();
+    }
+    
     // Carregar modelos de óculos
     glassesModels = await loadGlassesModels();
     renderGlassesGallery();
