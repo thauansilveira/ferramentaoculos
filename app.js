@@ -923,6 +923,39 @@ function capturePhoto() {
         
         glassesImg.onload = function() {
             try {
+                // Obter dimensões do display para calcular o fator de escala
+                const sourceRect = isUsingImage ? uploadedImageEl.getBoundingClientRect() : video.getBoundingClientRect();
+                const displayWidth = sourceRect.width;
+                const displayHeight = sourceRect.height;
+                
+                // Calcular dimensões reais da imagem/vídeo no display (considerando object-fit)
+                // Para vídeo: object-fit: cover, então usa todo o espaço
+                // Para imagem: object-fit: contain, então calcula dimensões reais
+                let sourceDisplayWidth = displayWidth;
+                let sourceDisplayHeight = displayHeight;
+                
+                if (isUsingImage) {
+                    // Para imagens com object-fit: contain, calcular dimensões reais exibidas
+                    const imageAspect = canvas.width / canvas.height;
+                    const containerAspect = displayWidth / displayHeight;
+                    
+                    if (containerAspect > imageAspect) {
+                        // Container mais largo - imagem ajusta pela altura
+                        sourceDisplayHeight = displayHeight;
+                        sourceDisplayWidth = displayHeight * imageAspect;
+                    } else {
+                        // Container mais alto - imagem ajusta pela largura
+                        sourceDisplayWidth = displayWidth;
+                        sourceDisplayHeight = displayWidth / imageAspect;
+                    }
+                }
+                
+                // Calcular fator de escala entre display e canvas
+                // Este fator converte pixels do display para pixels do canvas
+                const scaleX = canvas.width / sourceDisplayWidth;
+                const scaleY = canvas.height / sourceDisplayHeight;
+                const scaleFactor = Math.min(scaleX, scaleY);
+                
                 ctx.save();
                 ctx.translate(canvas.width / 2, canvas.height / 2);
                 
@@ -930,11 +963,17 @@ function capturePhoto() {
                     ctx.scale(-1, 1); // Espelhar óculos apenas para vídeo
                 }
                 
+                // Aplicar transformações na mesma ordem do CSS: scale, translate, rotate
+                // No CSS: scale(${size}) translate(${posX}px, ${posY}px) rotate(${rot}deg)
                 ctx.scale(glassesSize, glassesSize);
-                ctx.translate(glassesPositionX, glassesPositionY);
+                // Converter posição do display (em pixels) para posição do canvas
+                // O translate no CSS é aplicado após o scale, então os pixels são relativos ao tamanho escalado
+                ctx.translate(glassesPositionX * scaleFactor, glassesPositionY * scaleFactor);
                 ctx.rotate((glassesRotation * Math.PI) / 180);
                 
-                // Calcular dimensões dos óculos
+                // Calcular dimensões dos óculos (60% do canvas, igual ao overlay)
+                // No overlay, a imagem tem max-width: 60% e max-height: 60% do container
+                // Com object-fit: contain, ela mantém o aspect ratio
                 const baseWidth = canvas.width * 0.6;
                 const aspectRatio = glassesImg.height / glassesImg.width;
                 const glassesWidth = baseWidth;
