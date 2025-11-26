@@ -26,46 +26,28 @@
                         <div id="overlay" class="glasses-overlay"></div>
                     </div>
                     
-                    <!-- Botão flutuante de controles mobile -->
-                    <button class="mobile-controls-toggle-btn" id="mobileControlsToggleBtn">
-                        <span class="toggle-icon">⚙️</span>
-                    </button>
-                    <div class="mobile-controls-panel" id="mobileControlsPanel">
-                        <div class="panel-header">
-                            <span>Ajustes</span>
-                            <button class="panel-close" id="closePanelBtn">×</button>
-                        </div>
-                        <div class="panel-content">
-                            <div class="panel-control-item">
-                                <div class="panel-label-row">
-                                    <label>Tamanho</label>
-                                    <span class="panel-value" id="panelSizeValue">100%</span>
-                                </div>
-                                <div class="panel-buttons-row">
-                                    <button class="panel-btn" id="sizeDownBtn">−</button>
-                                    <button class="panel-btn" id="sizeUpBtn">+</button>
-                                </div>
+                    <!-- Controles mobile - aparecem logo abaixo do quadro -->
+                    <div class="mobile-settings-container" id="mobileSettingsContainer">
+                        <div class="settings-grid" id="settingsGridMobile">
+                            <div class="setting-item">
+                                <label for="glassesSizeMobile">Tamanho:</label>
+                                <input type="range" id="glassesSizeMobile" min="0.5" max="2" step="0.1" value="1">
+                                <span id="sizeValueMobile">100%</span>
                             </div>
-                            <div class="panel-control-item">
-                                <div class="panel-label-row">
-                                    <label>Mover</label>
-                                </div>
-                                <div class="panel-arrows-grid">
-                                    <button class="panel-arrow-btn" id="moveUpBtn">↑</button>
-                                    <button class="panel-arrow-btn" id="moveLeftBtn">←</button>
-                                    <button class="panel-arrow-btn" id="moveRightBtn">→</button>
-                                    <button class="panel-arrow-btn" id="moveDownBtn">↓</button>
-                                </div>
+                            <div class="setting-item">
+                                <label for="glassesPositionXMobile">Posição X:</label>
+                                <input type="range" id="glassesPositionXMobile" min="-150" max="150" step="1" value="0">
+                                <span id="positionXValueMobile">0px</span>
                             </div>
-                            <div class="panel-control-item">
-                                <div class="panel-label-row">
-                                    <label>Rotacionar</label>
-                                    <span class="panel-value" id="panelRotValue">0°</span>
-                                </div>
-                                <div class="panel-buttons-row">
-                                    <button class="panel-btn" id="rotateLeftBtn">↺</button>
-                                    <button class="panel-btn" id="rotateRightBtn">↻</button>
-                                </div>
+                            <div class="setting-item">
+                                <label for="glassesPositionYMobile">Posição Y:</label>
+                                <input type="range" id="glassesPositionYMobile" min="-150" max="150" step="1" value="0">
+                                <span id="positionYValueMobile">0px</span>
+                            </div>
+                            <div class="setting-item">
+                                <label for="glassesRotationMobile">Rotação:</label>
+                                <input type="range" id="glassesRotationMobile" min="-180" max="180" step="1" value="0">
+                                <span id="rotationValueMobile">0°</span>
                             </div>
                         </div>
                     </div>
