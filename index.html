@@ -24,46 +24,47 @@
                         <img id="uploadedImage" style="display: none; width: 100%; height: 100%; object-fit: contain;">
                         <canvas id="canvas"></canvas>
                         <div id="overlay" class="glasses-overlay"></div>
-                        <!-- Botão flutuante de controles mobile -->
-                        <button class="mobile-controls-toggle-btn" id="mobileControlsToggleBtn">
-                            <span class="toggle-icon">⚙️</span>
-                        </button>
-                        <div class="mobile-controls-panel" id="mobileControlsPanel">
-                            <div class="panel-header">
-                                <span>Ajustes</span>
-                                <button class="panel-close" id="closePanelBtn">×</button>
+                    </div>
+                    
+                    <!-- Botão flutuante de controles mobile -->
+                    <button class="mobile-controls-toggle-btn" id="mobileControlsToggleBtn">
+                        <span class="toggle-icon">⚙️</span>
+                    </button>
+                    <div class="mobile-controls-panel" id="mobileControlsPanel">
+                        <div class="panel-header">
+                            <span>Ajustes</span>
+                            <button class="panel-close" id="closePanelBtn">×</button>
+                        </div>
+                        <div class="panel-content">
+                            <div class="panel-control-item">
+                                <div class="panel-label-row">
+                                    <label>Tamanho</label>
+                                    <span class="panel-value" id="panelSizeValue">100%</span>
+                                </div>
+                                <div class="panel-buttons-row">
+                                    <button class="panel-btn" id="sizeDownBtn">−</button>
+                                    <button class="panel-btn" id="sizeUpBtn">+</button>
+                                </div>
                             </div>
-                            <div class="panel-content">
-                                <div class="panel-control-item">
-                                    <div class="panel-label-row">
-                                        <label>Tamanho</label>
-                                        <span class="panel-value" id="panelSizeValue">100%</span>
-                                    </div>
-                                    <div class="panel-buttons-row">
-                                        <button class="panel-btn" id="sizeDownBtn">−</button>
-                                        <button class="panel-btn" id="sizeUpBtn">+</button>
-                                    </div>
+                            <div class="panel-control-item">
+                                <div class="panel-label-row">
+                                    <label>Mover</label>
                                 </div>
-                                <div class="panel-control-item">
-                                    <div class="panel-label-row">
-                                        <label>Mover</label>
-                                    </div>
-                                    <div class="panel-arrows-grid">
-                                        <button class="panel-arrow-btn" id="moveUpBtn">↑</button>
-                                        <button class="panel-arrow-btn" id="moveLeftBtn">←</button>
-                                        <button class="panel-arrow-btn" id="moveRightBtn">→</button>
-                                        <button class="panel-arrow-btn" id="moveDownBtn">↓</button>
-                                    </div>
+                                <div class="panel-arrows-grid">
+                                    <button class="panel-arrow-btn" id="moveUpBtn">↑</button>
+                                    <button class="panel-arrow-btn" id="moveLeftBtn">←</button>
+                                    <button class="panel-arrow-btn" id="moveRightBtn">→</button>
+                                    <button class="panel-arrow-btn" id="moveDownBtn">↓</button>
                                 </div>
-                                <div class="panel-control-item">
-                                    <div class="panel-label-row">
-                                        <label>Rotacionar</label>
-                                        <span class="panel-value" id="panelRotValue">0°</span>
-                                    </div>
-                                    <div class="panel-buttons-row">
-                                        <button class="panel-btn" id="rotateLeftBtn">↺</button>
-                                        <button class="panel-btn" id="rotateRightBtn">↻</button>
-                                    </div>
+                            </div>
+                            <div class="panel-control-item">
+                                <div class="panel-label-row">
+                                    <label>Rotacionar</label>
+                                    <span class="panel-value" id="panelRotValue">0°</span>
+                                </div>
+                                <div class="panel-buttons-row">
+                                    <button class="panel-btn" id="rotateLeftBtn">↺</button>
+                                    <button class="panel-btn" id="rotateRightBtn">↻</button>
                                 </div>
                             </div>
                         </div>

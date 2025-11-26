@@ -228,7 +228,7 @@ main {
 
 /* Botão flutuante de controles mobile - estilo Photoshop */
 .mobile-controls-toggle-btn {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     right: 20px;
     width: 48px;
@@ -266,19 +266,21 @@ main {
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(216, 167, 99, 0.2);
     z-index: 99;
-    display: none;
+    display: none !important;
     flex-direction: column;
     overflow: hidden;
     border: 1px solid rgba(216, 167, 99, 0.25);
     transform: translateY(20px);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
 }
 
 .mobile-controls-panel.active {
-    display: flex;
+    display: flex !important;
     transform: translateY(0);
     opacity: 1;
+    pointer-events: auto;
 }
 
 .panel-header {
@@ -1040,6 +1042,10 @@ label.btn {
         position: relative;
     }
     
+    .settings-section {
+        display: none !important;
+    }
+    
     .mobile-controls-toggle-btn {
         display: flex !important;
         width: 44px;
@@ -1053,6 +1059,11 @@ label.btn {
         max-height: 350px;
         bottom: 70px;
         right: 16px;
+        display: none !important;
+    }
+    
+    .mobile-controls-panel.active {
+        display: flex !important;
     }
     
     .panel-content {
