@@ -85,13 +85,10 @@ const canvas = document.getElementById('canvas');
 const overlay = document.getElementById('overlay');
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
-const captureBtn = document.getElementById('captureBtn');
 const uploadImageInput = document.getElementById('uploadImage');
 const removeImageBtn = document.getElementById('removeImageBtn');
 const removeGlassesBtn = document.getElementById('removeGlassesBtn');
 const glassesGallery = document.getElementById('glassesGallery');
-const photosGallery = document.getElementById('photosGallery');
-const gallerySection = document.getElementById('gallerySection');
 
 // Controles de ajuste
 const sizeSlider = document.getElementById('glassesSize');
@@ -130,7 +127,6 @@ async function init() {
     glassesModels = await loadGlassesModels();
     renderGlassesGallery();
     setupEventListeners();
-    loadSavedPhotos();
     setupMobileControls();
 }
 
@@ -723,7 +719,6 @@ function setupDragAndDrop(img) {
 function setupEventListeners() {
     startBtn.addEventListener('click', startCamera);
     stopBtn.addEventListener('click', stopCamera);
-    captureBtn.addEventListener('click', capturePhoto);
     
     uploadImageInput.addEventListener('change', handleImageUpload);
     removeImageBtn.addEventListener('click', removeUploadedImage);
@@ -787,7 +782,6 @@ async function startCamera() {
         
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        captureBtn.disabled = false;
         
         // Selecionar primeiro óculos por padrão
         if (!currentGlasses && glassesModels.length > 0) {
@@ -815,7 +809,6 @@ function stopCamera() {
         overlay.innerHTML = '';
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        captureBtn.disabled = true;
     }
 }
 
@@ -837,8 +830,6 @@ function handleImageUpload(e) {
         video.style.display = 'none';
         isUsingImage = true;
         
-        // Habilitar captura
-        captureBtn.disabled = false;
         removeImageBtn.style.display = 'inline-block';
         
         // Selecionar primeiro óculos por padrão se não houver
@@ -862,203 +853,9 @@ function removeUploadedImage() {
     isUsingImage = false;
     overlay.innerHTML = '';
     removeImageBtn.style.display = 'none';
-    captureBtn.disabled = true;
     uploadImageInput.value = '';
 }
 
-// Capturar foto
-function capturePhoto() {
-    if (!stream && !isUsingImage) return;
-    
-    // Função auxiliar para capturar quando a imagem estiver pronta
-    function doCapture() {
-        let sourceWidth, sourceHeight;
-        
-        if (isUsingImage) {
-            // Aguardar imagem carregar completamente
-            if (!uploadedImageEl.complete || uploadedImageEl.naturalWidth === 0) {
-                uploadedImageEl.onload = doCapture;
-                return;
-            }
-            sourceWidth = uploadedImageEl.naturalWidth || uploadedImageEl.width;
-            sourceHeight = uploadedImageEl.naturalHeight || uploadedImageEl.height;
-        } else {
-            sourceWidth = video.videoWidth;
-            sourceHeight = video.videoHeight;
-        }
-        
-        if (!sourceWidth || !sourceHeight) {
-            alert('Erro: Não foi possível obter as dimensões da imagem/vídeo.');
-            return;
-        }
-        
-        canvas.width = sourceWidth;
-        canvas.height = sourceHeight;
-        
-        const ctx = canvas.getContext('2d');
-        
-        // Desenhar imagem ou vídeo
-        if (isUsingImage) {
-            ctx.drawImage(uploadedImageEl, 0, 0, canvas.width, canvas.height);
-        } else {
-            // Desenhar vídeo (espelhado)
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            ctx.restore();
-        }
-        
-        // Se não houver óculos, apenas salvar a imagem
-        if (!currentGlasses) {
-            const dataURL = canvas.toDataURL('image/png');
-            savePhoto(dataURL);
-            return;
-        }
-        
-        // Desenhar óculos
-        const glassesImg = new Image();
-        
-        // Não usar crossOrigin para arquivos locais
-        // glassesImg.crossOrigin = 'anonymous';
-        
-        glassesImg.onload = function() {
-            try {
-                // Obter dimensões do display para calcular o fator de escala
-                const sourceRect = isUsingImage ? uploadedImageEl.getBoundingClientRect() : video.getBoundingClientRect();
-                const displayWidth = sourceRect.width;
-                const displayHeight = sourceRect.height;
-                
-                // Calcular dimensões reais da imagem/vídeo no display (considerando object-fit)
-                // Para vídeo: object-fit: cover, então usa todo o espaço
-                // Para imagem: object-fit: contain, então calcula dimensões reais
-                let sourceDisplayWidth = displayWidth;
-                let sourceDisplayHeight = displayHeight;
-                
-                if (isUsingImage) {
-                    // Para imagens com object-fit: contain, calcular dimensões reais exibidas
-                    const imageAspect = canvas.width / canvas.height;
-                    const containerAspect = displayWidth / displayHeight;
-                    
-                    if (containerAspect > imageAspect) {
-                        // Container mais largo - imagem ajusta pela altura
-                        sourceDisplayHeight = displayHeight;
-                        sourceDisplayWidth = displayHeight * imageAspect;
-                    } else {
-                        // Container mais alto - imagem ajusta pela largura
-                        sourceDisplayWidth = displayWidth;
-                        sourceDisplayHeight = displayWidth / imageAspect;
-                    }
-                }
-                
-                // Calcular fator de escala entre display e canvas
-                // Este fator converte pixels do display para pixels do canvas
-                const scaleX = canvas.width / sourceDisplayWidth;
-                const scaleY = canvas.height / sourceDisplayHeight;
-                const scaleFactor = Math.min(scaleX, scaleY);
-                
-                ctx.save();
-                ctx.translate(canvas.width / 2, canvas.height / 2);
-                
-                if (!isUsingImage) {
-                    ctx.scale(-1, 1); // Espelhar óculos apenas para vídeo
-                }
-                
-                // Aplicar transformações na mesma ordem do CSS: scale, translate, rotate
-                // No CSS: scale(${size}) translate(${posX}px, ${posY}px) rotate(${rot}deg)
-                ctx.scale(glassesSize, glassesSize);
-                // Converter posição do display (em pixels) para posição do canvas
-                // O translate no CSS é aplicado após o scale, então os pixels são relativos ao tamanho escalado
-                ctx.translate(glassesPositionX * scaleFactor, glassesPositionY * scaleFactor);
-                ctx.rotate((glassesRotation * Math.PI) / 180);
-                
-                // Calcular dimensões dos óculos (60% do canvas, igual ao overlay)
-                // No overlay, a imagem tem max-width: 60% e max-height: 60% do container
-                // Com object-fit: contain, ela mantém o aspect ratio
-                const baseWidth = canvas.width * 0.6;
-                const aspectRatio = glassesImg.height / glassesImg.width;
-                const glassesWidth = baseWidth;
-                const glassesHeight = baseWidth * aspectRatio;
-                
-                ctx.drawImage(glassesImg, -glassesWidth / 2, -glassesHeight / 2, glassesWidth, glassesHeight);
-                ctx.restore();
-                
-                // Salvar foto
-                const dataURL = canvas.toDataURL('image/png');
-                savePhoto(dataURL);
-            } catch (error) {
-                console.error('Erro ao desenhar óculos:', error);
-                alert('Erro ao processar a imagem. Tente novamente.');
-            }
-        };
-        
-        glassesImg.onerror = function(e) {
-            console.error('Erro ao carregar imagem dos óculos:', currentGlasses.image, e);
-            // Tentar carregar novamente sem cache
-            const img = new Image();
-            img.onload = glassesImg.onload;
-            img.onerror = function() {
-                alert('Erro ao carregar a imagem dos óculos: ' + currentGlasses.image + '\n\nVerifique se o arquivo existe na pasta.');
-            };
-            // Adicionar timestamp para evitar cache
-            img.src = currentGlasses.image + '?t=' + Date.now();
-        };
-        
-        // Tentar carregar a imagem
-        if (currentGlasses && currentGlasses.image) {
-            glassesImg.src = currentGlasses.image;
-        } else {
-            alert('Nenhum óculos selecionado.');
-        }
-    }
-    
-    // Iniciar captura
-    doCapture();
-}
-
-// Salvar foto
-function savePhoto(dataURL) {
-    const photos = JSON.parse(localStorage.getItem('glassesPhotos') || '[]');
-    photos.push(dataURL);
-    localStorage.setItem('glassesPhotos', JSON.stringify(photos));
-    
-    displayPhotos();
-}
-
-// Exibir fotos salvas
-function displayPhotos() {
-    const photos = JSON.parse(localStorage.getItem('glassesPhotos') || '[]');
-    
-    if (photos.length === 0) {
-        gallerySection.style.display = 'none';
-        return;
-    }
-    
-    gallerySection.style.display = 'block';
-    photosGallery.innerHTML = '';
-    
-    photos.forEach((photo, index) => {
-        const item = document.createElement('div');
-        item.className = 'photo-item';
-        item.innerHTML = `
-            <img src="${photo}" alt="Foto ${index + 1}">
-            <button class="delete-btn" onclick="deletePhoto(${index})">×</button>
-        `;
-        photosGallery.appendChild(item);
-    });
-}
-
-// Deletar foto
-window.deletePhoto = function(index) {
-    const photos = JSON.parse(localStorage.getItem('glassesPhotos') || '[]');
-    photos.splice(index, 1);
-    localStorage.setItem('glassesPhotos', JSON.stringify(photos));
-    displayPhotos();
-};
-
-// Carregar fotos salvas
-function loadSavedPhotos() {
-    displayPhotos();
-}
 
 // Inicializar quando a página carregar
 init();
