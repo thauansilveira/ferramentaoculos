@@ -139,6 +139,28 @@ main {
     gap: 10px;
 }
 
+@media (max-width: 768px) {
+    .camera-section {
+        gap: 8px;
+    }
+    
+    .video-container {
+        order: 0;
+    }
+    
+    .mobile-settings-container {
+        order: 1;
+    }
+    
+    .instructions-box {
+        order: 2;
+    }
+    
+    .controls {
+        order: 3;
+    }
+}
+
 .video-container {
     position: relative;
     width: 100%;
@@ -234,13 +256,16 @@ main {
 @media (max-width: 768px) {
     .mobile-settings-container {
         display: block;
-        margin-top: 12px;
-        padding: 12px;
+        margin-top: 6px;
+        margin-bottom: 0;
+        padding: 10px 12px;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         border-radius: 12px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(216, 167, 99, 0.2);
+        order: 1; /* Garantir que aparece logo após o video-container */
+        flex-shrink: 0;
     }
     
     .mobile-settings-container .settings-grid {
@@ -866,6 +891,7 @@ label.btn {
         min-height: 300px;
         max-height: 60vh;
         position: relative;
+        margin-bottom: 0;
     }
     
     .settings-section {

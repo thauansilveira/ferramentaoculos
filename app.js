@@ -394,6 +394,9 @@ function setupDragAndDrop(img) {
     
     let initialTouchAngle = 0;
     let initialTouchDistance = 0;
+    let lastPinchDistance = 0;
+    let isPinching = false;
+    let pinchStartTime = 0;
     
     function startDragTouch(e) {
         e.preventDefault();
@@ -409,6 +412,7 @@ function setupDragAndDrop(img) {
                 Math.pow(touch2.clientX - touch1.clientX, 2) +
                 Math.pow(touch2.clientY - touch1.clientY, 2)
             );
+            lastPinchDistance = initialTouchDistance;
             
             // Calcular ângulo inicial para rotação
             initialTouchAngle = Math.atan2(
@@ -418,10 +422,13 @@ function setupDragAndDrop(img) {
             
             dragStartX = initialTouchDistance;
             dragMode = 'resize'; // Começar com resize, pode mudar para rotate
+            isPinching = true;
+            pinchStartTime = Date.now();
         } else {
             dragMode = 'move';
             dragStartX = e.touches[0].clientX;
             dragStartY = e.touches[0].clientY;
+            isPinching = false;
         }
         
         isDragging = true;
@@ -549,13 +556,23 @@ function setupDragAndDrop(img) {
                 touch2.clientX - touch1.clientX
             );
             
-            // Detectar se é rotação ou redimensionamento
+            // Calcular mudanças
             const angleChangeDeg = Math.abs((currentAngle - initialTouchAngle) * 180 / Math.PI);
             const distanceChange = Math.abs(currentDistance - initialTouchDistance);
+            const distanceChangeFromLast = Math.abs(currentDistance - lastPinchDistance);
             
-            // Se mudança de ângulo for significativa, é rotação
-            if (angleChangeDeg > 3 && distanceChange < 80) {
-                // Rotação
+            // Detectar se é rotação ou redimensionamento baseado no gesto dominante
+            // Se a mudança de ângulo for significativa E a mudança de distância for pequena, é rotação
+            // Caso contrário, é zoom (pinch)
+            // Ajustar thresholds para melhor detecção
+            const timeSinceStart = Date.now() - pinchStartTime;
+            const isRotationGesture = angleChangeDeg > 8 && distanceChange < 40;
+            // Tornar zoom mais sensível, especialmente no início do gesto
+            const zoomThreshold = timeSinceStart < 200 ? 8 : 12; // Mais sensível nos primeiros 200ms
+            const isZoomGesture = distanceChange > zoomThreshold || (distanceChangeFromLast > 3 && !isRotationGesture);
+            
+            if (isRotationGesture && !isZoomGesture) {
+                // Rotação pura
                 const rotationChange = (currentAngle - initialTouchAngle) * 180 / Math.PI;
                 glassesRotation = initialRotation + rotationChange;
                 glassesRotation = Math.max(-180, Math.min(180, glassesRotation));
@@ -563,13 +580,36 @@ function setupDragAndDrop(img) {
                 rotationSlider.value = glassesRotation;
                 rotationValue.textContent = Math.round(glassesRotation) + '°';
                 syncMobileControls();
-            } else if (distanceChange > 10) {
-                // Redimensionamento (só se distância mudou significativamente)
-                const scaleChange = (currentDistance - initialTouchDistance) * 0.0008;
-                glassesSize = Math.max(0.3, Math.min(3, initialSize + scaleChange));
+            } else if (isZoomGesture) {
+                // Zoom/Pinch - melhorado para ser mais responsivo e suave
+                // Usar razão de distância para zoom mais preciso e natural
+                const scaleRatio = currentDistance / initialTouchDistance;
+                let newSize = initialSize * scaleRatio;
                 
-                sizeSlider.value = glassesSize;
-                sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+                // Aplicar limites com suavização
+                newSize = Math.max(0.3, Math.min(3, newSize));
+                
+                // Suavizar mudanças muito pequenas para evitar tremulação
+                if (Math.abs(newSize - glassesSize) > 0.01) {
+                    glassesSize = newSize;
+                    
+                    sizeSlider.value = glassesSize;
+                    sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+                    syncMobileControls();
+                }
+                
+                // Atualizar última distância para suavizar o zoom contínuo
+                lastPinchDistance = currentDistance;
+            }
+            
+            // Se ambos os gestos estão acontecendo, priorizar zoom mas permitir rotação leve
+            if (isZoomGesture && angleChangeDeg > 2 && angleChangeDeg < 10) {
+                const rotationChange = (currentAngle - initialTouchAngle) * 180 / Math.PI * 0.3; // Reduzir sensibilidade quando combinado
+                glassesRotation = initialRotation + rotationChange;
+                glassesRotation = Math.max(-180, Math.min(180, glassesRotation));
+                
+                rotationSlider.value = glassesRotation;
+                rotationValue.textContent = Math.round(glassesRotation) + '°';
                 syncMobileControls();
             }
             
@@ -618,6 +658,8 @@ function setupDragAndDrop(img) {
     function stopDrag() {
         if (!isDragging) return;
         isDragging = false;
+        isPinching = false;
+        lastPinchDistance = 0;
         document.removeEventListener('mousemove', drag);
         document.removeEventListener('mouseup', stopDrag);
         document.removeEventListener('touchmove', dragTouch);
