@@ -1,0 +1,35 @@
+# Arquivos temporários
+*.tmp
+*.log
+*.cache
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos Python (se houver)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Arquivos de servidor
+server_https.py
+localhost+3.pem
+localhost+3-key.pem
+
+# Documentação local (opcional - pode remover se quiser incluir)
+# SERVIDOR_LOCAL.md
+# SOLUCAO_CAMERA.md
+# CONFIGURAR_HTTPS.md
+
