@@ -226,6 +226,115 @@ main {
     pointer-events: auto;
 }
 
+/* Barra lateral de controles mobile */
+.mobile-side-controls {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 12px 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    border: 1px solid rgba(216, 167, 99, 0.3);
+    min-width: 70px;
+}
+
+.side-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.side-control-group label {
+    font-size: 0.7em;
+    color: #5a4a3a;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.side-control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+}
+
+.side-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1.5px solid #D1B5A7;
+    background: #E9D3C6;
+    color: #4B3B33;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(216, 167, 99, 0.15);
+}
+
+.side-btn:active {
+    transform: scale(0.95);
+    background: #D8A763;
+    color: white;
+    border-color: #D8A763;
+}
+
+.side-value {
+    font-size: 0.75em;
+    color: #D8A763;
+    font-weight: 600;
+    min-height: 20px;
+    text-align: center;
+}
+
+.side-control-arrows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.side-arrows-horizontal {
+    display: flex;
+    gap: 4px;
+}
+
+.side-arrow-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1.5px solid #D1B5A7;
+    background: #E9D3C6;
+    color: #4B3B33;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(216, 167, 99, 0.15);
+}
+
+.side-arrow-btn:active {
+    transform: scale(0.95);
+    background: #D8A763;
+    color: white;
+    border-color: #D8A763;
+}
+
 .glasses-overlay img {
     max-width: 60%;
     max-height: 60%;
@@ -824,7 +933,41 @@ label.btn {
     .video-container {
         border-radius: 16px;
         min-height: 300px;
-        max-height: 50vh;
+        max-height: 60vh;
+        position: relative;
+    }
+    
+    .mobile-side-controls {
+        display: flex !important;
+        right: 8px;
+        padding: 10px 6px;
+        min-width: 60px;
+        gap: 12px;
+    }
+    
+    .side-control-group {
+        gap: 6px;
+    }
+    
+    .side-control-group label {
+        font-size: 0.65em;
+    }
+    
+    .side-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1em;
+    }
+    
+    .side-arrow-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9em;
+    }
+    
+    .side-value {
+        font-size: 0.7em;
+        min-height: 18px;
     }
 
     .instructions-box {

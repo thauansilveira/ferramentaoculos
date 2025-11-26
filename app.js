@@ -217,6 +217,139 @@ function setupMobileControls() {
     if (posXMobile) posXMobile.value = glassesPositionX;
     if (posYMobile) posYMobile.value = glassesPositionY;
     if (rotMobile) rotMobile.value = glassesRotation;
+    
+    // Configurar controles da barra lateral
+    setupSideControls();
+}
+
+// Configurar controles da barra lateral mobile
+function setupSideControls() {
+    const isMobile = window.innerWidth <= 768;
+    const sideControls = document.getElementById('mobileSideControls');
+    
+    if (!sideControls) return;
+    
+    // Mostrar apenas no mobile
+    if (isMobile) {
+        sideControls.style.display = 'flex';
+    } else {
+        sideControls.style.display = 'none';
+        return;
+    }
+    
+    // Botões de tamanho
+    const sizeDownBtn = document.getElementById('sizeDownBtn');
+    const sizeUpBtn = document.getElementById('sizeUpBtn');
+    const sideSizeValue = document.getElementById('sideSizeValue');
+    
+    if (sizeDownBtn) {
+        sizeDownBtn.addEventListener('click', () => {
+            glassesSize = Math.max(0.3, glassesSize - 0.1);
+            sizeSlider.value = glassesSize;
+            sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (sizeUpBtn) {
+        sizeUpBtn.addEventListener('click', () => {
+            glassesSize = Math.min(3, glassesSize + 0.1);
+            sizeSlider.value = glassesSize;
+            sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    // Botões de movimento
+    const moveUpBtn = document.getElementById('moveUpBtn');
+    const moveDownBtn = document.getElementById('moveDownBtn');
+    const moveLeftBtn = document.getElementById('moveLeftBtn');
+    const moveRightBtn = document.getElementById('moveRightBtn');
+    
+    const moveStep = 5; // Pixels por clique
+    
+    if (moveUpBtn) {
+        moveUpBtn.addEventListener('click', () => {
+            glassesPositionY = Math.max(-150, glassesPositionY - moveStep);
+            positionYSlider.value = glassesPositionY;
+            positionYValue.textContent = glassesPositionY + 'px';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (moveDownBtn) {
+        moveDownBtn.addEventListener('click', () => {
+            glassesPositionY = Math.min(150, glassesPositionY + moveStep);
+            positionYSlider.value = glassesPositionY;
+            positionYValue.textContent = glassesPositionY + 'px';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (moveLeftBtn) {
+        moveLeftBtn.addEventListener('click', () => {
+            glassesPositionX = Math.max(-150, glassesPositionX - moveStep);
+            positionXSlider.value = glassesPositionX;
+            positionXValue.textContent = glassesPositionX + 'px';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (moveRightBtn) {
+        moveRightBtn.addEventListener('click', () => {
+            glassesPositionX = Math.min(150, glassesPositionX + moveStep);
+            positionXSlider.value = glassesPositionX;
+            positionXValue.textContent = glassesPositionX + 'px';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    // Botões de rotação
+    const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+    const rotateRightBtn = document.getElementById('rotateRightBtn');
+    const sideRotValue = document.getElementById('sideRotValue');
+    
+    if (rotateLeftBtn) {
+        rotateLeftBtn.addEventListener('click', () => {
+            glassesRotation = Math.max(-180, glassesRotation - 5);
+            rotationSlider.value = glassesRotation;
+            rotationValue.textContent = glassesRotation + '°';
+            if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (rotateRightBtn) {
+        rotateRightBtn.addEventListener('click', () => {
+            glassesRotation = Math.min(180, glassesRotation + 5);
+            rotationSlider.value = glassesRotation;
+            rotationValue.textContent = glassesRotation + '°';
+            if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+            syncMobileControls();
+            updateGlassesOverlay();
+        });
+    }
+    
+    // Atualizar valores iniciais
+    if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+    if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+    
+    // Sincronizar quando valores mudarem via syncMobileControls
+    const originalSync = syncMobileControls;
+    window.syncMobileControls = function() {
+        originalSync();
+        if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+        if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+    };
 }
 
 // Renderizar galeria de óculos
@@ -379,20 +512,32 @@ function setupDragAndDrop(img) {
         document.addEventListener('keyup', checkModifierKeys);
     }
     
+    let initialTouchAngle = 0;
+    let initialTouchDistance = 0;
+    
     function startDragTouch(e) {
         e.preventDefault();
         e.stopPropagation();
         
         // Para touch, usar gestos: 1 dedo = mover, 2 dedos = redimensionar/rotacionar
         if (e.touches.length === 2) {
-            dragMode = 'resize';
-            // Calcular distância inicial entre os dois dedos
             const touch1 = e.touches[0];
             const touch2 = e.touches[1];
-            dragStartX = Math.sqrt(
+            
+            // Calcular distância inicial
+            initialTouchDistance = Math.sqrt(
                 Math.pow(touch2.clientX - touch1.clientX, 2) +
                 Math.pow(touch2.clientY - touch1.clientY, 2)
             );
+            
+            // Calcular ângulo inicial para rotação
+            initialTouchAngle = Math.atan2(
+                touch2.clientY - touch1.clientY,
+                touch2.clientX - touch1.clientX
+            );
+            
+            dragStartX = initialTouchDistance;
+            dragMode = 'resize'; // Começar com resize, pode mudar para rotate
         } else {
             dragMode = 'move';
             dragStartX = e.touches[0].clientX;
@@ -509,26 +654,46 @@ function setupDragAndDrop(img) {
         e.preventDefault();
         
         if (e.touches.length === 2) {
-            // Pinça para redimensionar
             const touch1 = e.touches[0];
             const touch2 = e.touches[1];
-            const distance = Math.sqrt(
+            
+            // Calcular distância atual
+            const currentDistance = Math.sqrt(
                 Math.pow(touch2.clientX - touch1.clientX, 2) +
                 Math.pow(touch2.clientY - touch1.clientY, 2)
             );
             
-            if (dragMode === 'resize') {
-                // Para touch, calcular mudança baseada na distância inicial
-                const initialDistance = dragStartX || distance;
-                // Muito reduzida sensibilidade para melhor precisão no mobile
-                const scaleChange = (distance - initialDistance) * 0.0008;
+            // Calcular ângulo atual
+            const currentAngle = Math.atan2(
+                touch2.clientY - touch1.clientY,
+                touch2.clientX - touch1.clientX
+            );
+            
+            // Detectar se é rotação ou redimensionamento
+            const angleChangeDeg = Math.abs((currentAngle - initialTouchAngle) * 180 / Math.PI);
+            const distanceChange = Math.abs(currentDistance - initialTouchDistance);
+            
+            // Se mudança de ângulo for significativa, é rotação
+            if (angleChangeDeg > 3 && distanceChange < 80) {
+                // Rotação
+                const rotationChange = (currentAngle - initialTouchAngle) * 180 / Math.PI;
+                glassesRotation = initialRotation + rotationChange;
+                glassesRotation = Math.max(-180, Math.min(180, glassesRotation));
+                
+                rotationSlider.value = glassesRotation;
+                rotationValue.textContent = Math.round(glassesRotation) + '°';
+                syncMobileControls();
+            } else if (distanceChange > 10) {
+                // Redimensionamento (só se distância mudou significativamente)
+                const scaleChange = (currentDistance - initialTouchDistance) * 0.0008;
                 glassesSize = Math.max(0.3, Math.min(3, initialSize + scaleChange));
                 
                 sizeSlider.value = glassesSize;
                 sizeValue.textContent = Math.round(glassesSize * 100) + '%';
                 syncMobileControls();
-                updateGlassesOverlay();
             }
+            
+            updateGlassesOverlay();
         } else {
             // Um dedo para mover
             const deltaX = e.touches[0].clientX - dragStartX;

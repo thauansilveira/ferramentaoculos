@@ -24,6 +24,36 @@
                         <img id="uploadedImage" style="display: none; width: 100%; height: 100%; object-fit: contain;">
                         <canvas id="canvas"></canvas>
                         <div id="overlay" class="glasses-overlay"></div>
+                        <!-- Barra lateral de controles mobile -->
+                        <div class="mobile-side-controls" id="mobileSideControls">
+                            <div class="side-control-group">
+                                <label>Tamanho</label>
+                                <div class="side-control-buttons">
+                                    <button class="side-btn" id="sizeDownBtn">−</button>
+                                    <span class="side-value" id="sideSizeValue">100%</span>
+                                    <button class="side-btn" id="sizeUpBtn">+</button>
+                                </div>
+                            </div>
+                            <div class="side-control-group">
+                                <label>Mover</label>
+                                <div class="side-control-arrows">
+                                    <button class="side-arrow-btn" id="moveUpBtn">↑</button>
+                                    <div class="side-arrows-horizontal">
+                                        <button class="side-arrow-btn" id="moveLeftBtn">←</button>
+                                        <button class="side-arrow-btn" id="moveRightBtn">→</button>
+                                    </div>
+                                    <button class="side-arrow-btn" id="moveDownBtn">↓</button>
+                                </div>
+                            </div>
+                            <div class="side-control-group">
+                                <label>Rotacionar</label>
+                                <div class="side-control-buttons">
+                                    <button class="side-btn" id="rotateLeftBtn">↺</button>
+                                    <span class="side-value" id="sideRotValue">0°</span>
+                                    <button class="side-btn" id="rotateRightBtn">↻</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="instructions-box">
