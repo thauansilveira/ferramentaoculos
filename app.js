@@ -103,6 +103,27 @@ const positionXValue = document.getElementById('positionXValue');
 const positionYValue = document.getElementById('positionYValue');
 const rotationValue = document.getElementById('rotationValue');
 
+// Função auxiliar para sincronizar controles mobile
+function syncMobileControls() {
+    const sizeMobile = document.getElementById('glassesSizeMobile');
+    const posXMobile = document.getElementById('glassesPositionXMobile');
+    const posYMobile = document.getElementById('glassesPositionYMobile');
+    const rotMobile = document.getElementById('glassesRotationMobile');
+    const sizeValueMobile = document.getElementById('sizeValueMobile');
+    const posXValueMobile = document.getElementById('positionXValueMobile');
+    const posYValueMobile = document.getElementById('positionYValueMobile');
+    const rotValueMobile = document.getElementById('rotationValueMobile');
+    
+    if (sizeMobile) sizeMobile.value = glassesSize;
+    if (posXMobile) posXMobile.value = glassesPositionX;
+    if (posYMobile) posYMobile.value = glassesPositionY;
+    if (rotMobile) rotMobile.value = glassesRotation;
+    if (sizeValueMobile) sizeValueMobile.textContent = Math.round(glassesSize * 100) + '%';
+    if (posXValueMobile) posXValueMobile.textContent = Math.round(glassesPositionX) + 'px';
+    if (posYValueMobile) posYValueMobile.textContent = Math.round(glassesPositionY) + 'px';
+    if (rotValueMobile) rotValueMobile.textContent = glassesRotation + '°';
+}
+
 // Inicialização
 async function init() {
     // Carregar modelos de óculos
@@ -110,6 +131,92 @@ async function init() {
     renderGlassesGallery();
     setupEventListeners();
     loadSavedPhotos();
+    setupMobileControls();
+}
+
+// Configurar controles mobile
+function setupMobileControls() {
+    const isMobile = window.innerWidth <= 768;
+    const mobileToggle = document.getElementById('mobileControlsToggle');
+    const mobileOverlay = document.getElementById('mobileControlsOverlay');
+    const closeBtn = document.getElementById('closeMobileControls');
+    
+    if (!mobileToggle || !mobileOverlay) return;
+    
+    // Mostrar botão toggle apenas no mobile
+    if (isMobile) {
+        mobileToggle.style.display = 'flex';
+        // Esconder controles normais no mobile
+        const settingsSection = document.querySelector('.settings-section');
+        if (settingsSection) {
+            settingsSection.style.display = 'none';
+        }
+    }
+    
+    // Toggle controles mobile
+    mobileToggle.addEventListener('click', () => {
+        mobileOverlay.style.display = mobileOverlay.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    closeBtn.addEventListener('click', () => {
+        mobileOverlay.style.display = 'none';
+    });
+    
+    // Sincronizar controles mobile com os principais
+    const sizeMobile = document.getElementById('glassesSizeMobile');
+    const posXMobile = document.getElementById('glassesPositionXMobile');
+    const posYMobile = document.getElementById('glassesPositionYMobile');
+    const rotMobile = document.getElementById('glassesRotationMobile');
+    const sizeValueMobile = document.getElementById('sizeValueMobile');
+    const posXValueMobile = document.getElementById('positionXValueMobile');
+    const posYValueMobile = document.getElementById('positionYValueMobile');
+    const rotValueMobile = document.getElementById('rotationValueMobile');
+    
+    if (sizeMobile) {
+        sizeMobile.addEventListener('input', (e) => {
+            glassesSize = parseFloat(e.target.value);
+            sizeValueMobile.textContent = Math.round(glassesSize * 100) + '%';
+            sizeSlider.value = glassesSize;
+            sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (posXMobile) {
+        posXMobile.addEventListener('input', (e) => {
+            glassesPositionX = parseInt(e.target.value);
+            posXValueMobile.textContent = glassesPositionX + 'px';
+            positionXSlider.value = glassesPositionX;
+            positionXValue.textContent = glassesPositionX + 'px';
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (posYMobile) {
+        posYMobile.addEventListener('input', (e) => {
+            glassesPositionY = parseInt(e.target.value);
+            posYValueMobile.textContent = glassesPositionY + 'px';
+            positionYSlider.value = glassesPositionY;
+            positionYValue.textContent = glassesPositionY + 'px';
+            updateGlassesOverlay();
+        });
+    }
+    
+    if (rotMobile) {
+        rotMobile.addEventListener('input', (e) => {
+            glassesRotation = parseInt(e.target.value);
+            rotValueMobile.textContent = glassesRotation + '°';
+            rotationSlider.value = glassesRotation;
+            rotationValue.textContent = glassesRotation + '°';
+            updateGlassesOverlay();
+        });
+    }
+    
+    // Sincronizar valores iniciais
+    if (sizeMobile) sizeMobile.value = glassesSize;
+    if (posXMobile) posXMobile.value = glassesPositionX;
+    if (posYMobile) posYMobile.value = glassesPositionY;
+    if (rotMobile) rotMobile.value = glassesRotation;
 }
 
 // Renderizar galeria de óculos
@@ -391,6 +498,7 @@ function setupDragAndDrop(img) {
             
             rotationSlider.value = glassesRotation;
             rotationValue.textContent = Math.round(glassesRotation) + '°';
+            syncMobileControls();
         }
         
         updateGlassesOverlay();
@@ -412,12 +520,13 @@ function setupDragAndDrop(img) {
             if (dragMode === 'resize') {
                 // Para touch, calcular mudança baseada na distância inicial
                 const initialDistance = dragStartX || distance;
-                // Reduzida sensibilidade - multiplicador menor (0.002 em vez de cálculo direto)
-                const scaleChange = (distance - initialDistance) * 0.002;
+                // Muito reduzida sensibilidade para melhor precisão no mobile
+                const scaleChange = (distance - initialDistance) * 0.0008;
                 glassesSize = Math.max(0.3, Math.min(3, initialSize + scaleChange));
                 
                 sizeSlider.value = glassesSize;
                 sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+                syncMobileControls();
                 updateGlassesOverlay();
             }
         } else {
@@ -456,6 +565,7 @@ function setupDragAndDrop(img) {
             positionXValue.textContent = Math.round(glassesPositionX) + 'px';
             positionYValue.textContent = Math.round(glassesPositionY) + 'px';
             
+            syncMobileControls();
             updateGlassesOverlay();
         }
     }
@@ -490,18 +600,21 @@ function setupEventListeners() {
     sizeSlider.addEventListener('input', (e) => {
         glassesSize = parseFloat(e.target.value);
         sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+        syncMobileControls();
         updateGlassesOverlay();
     });
     
     positionXSlider.addEventListener('input', (e) => {
         glassesPositionX = parseInt(e.target.value);
         positionXValue.textContent = glassesPositionX + 'px';
+        syncMobileControls();
         updateGlassesOverlay();
     });
     
     positionYSlider.addEventListener('input', (e) => {
         glassesPositionY = parseInt(e.target.value);
         positionYValue.textContent = glassesPositionY + 'px';
+        syncMobileControls();
         updateGlassesOverlay();
     });
     
@@ -514,6 +627,7 @@ function setupEventListeners() {
     rotationSlider.addEventListener('input', (e) => {
         glassesRotation = parseInt(e.target.value);
         rotationValue.textContent = glassesRotation + '°';
+        syncMobileControls();
         updateGlassesOverlay();
     });
 }

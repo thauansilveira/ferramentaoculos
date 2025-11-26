@@ -65,7 +65,7 @@
 
                 <div class="settings-section">
                     <h2>Ajustes</h2>
-                    <div class="settings-grid">
+                    <div class="settings-grid" id="settingsGrid">
                         <div class="setting-item">
                             <label for="glassesSize">Tamanho:</label>
                             <input type="range" id="glassesSize" min="0.5" max="2" step="0.1" value="1">
@@ -89,6 +89,37 @@
                     </div>
                     <div class="tips-box">
                         <p><strong>💡 Dicas:</strong> Arraste para mover | <strong>Shift</strong> + Arraste para redimensionar | <strong>Ctrl</strong> + Arraste para rotacionar</p>
+                    </div>
+                </div>
+                
+                <!-- Controles flutuantes para mobile -->
+                <button class="mobile-controls-toggle" id="mobileControlsToggle" style="display: none;">⚙️</button>
+                <div class="mobile-controls-overlay" id="mobileControlsOverlay" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="margin: 0; font-size: 1em; color: #5a4a3a;">Ajustes</h3>
+                        <button id="closeMobileControls" style="background: #E9D3C6; border: 1.5px solid #D1B5A7; border-radius: 8px; padding: 6px 12px; color: #4B3B33; font-size: 0.8em; cursor: pointer;">Fechar</button>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label for="glassesSizeMobile">Tamanho:</label>
+                            <input type="range" id="glassesSizeMobile" min="0.5" max="2" step="0.1" value="1">
+                            <span id="sizeValueMobile">100%</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="glassesPositionXMobile">Posição X:</label>
+                            <input type="range" id="glassesPositionXMobile" min="-150" max="150" step="1" value="0">
+                            <span id="positionXValueMobile">0px</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="glassesPositionYMobile">Posição Y:</label>
+                            <input type="range" id="glassesPositionYMobile" min="-150" max="150" step="1" value="0">
+                            <span id="positionYValueMobile">0px</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="glassesRotationMobile">Rotação:</label>
+                            <input type="range" id="glassesRotationMobile" min="-180" max="180" step="1" value="0">
+                            <span id="rotationValueMobile">0°</span>
+                        </div>
                     </div>
                 </div>
             </div>
