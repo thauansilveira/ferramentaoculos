@@ -137,86 +137,12 @@ async function init() {
 // Configurar controles mobile
 function setupMobileControls() {
     const isMobile = window.innerWidth <= 768;
-    const mobileToggle = document.getElementById('mobileControlsToggle');
-    const mobileOverlay = document.getElementById('mobileControlsOverlay');
-    const closeBtn = document.getElementById('closeMobileControls');
     
-    if (!mobileToggle || !mobileOverlay) return;
-    
-    // Mostrar botão toggle apenas no mobile
-    if (isMobile) {
-        mobileToggle.style.display = 'flex';
-        // Esconder controles normais no mobile
-        const settingsSection = document.querySelector('.settings-section');
-        if (settingsSection) {
-            settingsSection.style.display = 'none';
-        }
+    // Esconder controles normais no mobile
+    const settingsSection = document.querySelector('.settings-section');
+    if (settingsSection) {
+        settingsSection.style.display = isMobile ? 'none' : 'block';
     }
-    
-    // Toggle controles mobile
-    mobileToggle.addEventListener('click', () => {
-        mobileOverlay.style.display = mobileOverlay.style.display === 'none' ? 'block' : 'none';
-    });
-    
-    closeBtn.addEventListener('click', () => {
-        mobileOverlay.style.display = 'none';
-    });
-    
-    // Sincronizar controles mobile com os principais
-    const sizeMobile = document.getElementById('glassesSizeMobile');
-    const posXMobile = document.getElementById('glassesPositionXMobile');
-    const posYMobile = document.getElementById('glassesPositionYMobile');
-    const rotMobile = document.getElementById('glassesRotationMobile');
-    const sizeValueMobile = document.getElementById('sizeValueMobile');
-    const posXValueMobile = document.getElementById('positionXValueMobile');
-    const posYValueMobile = document.getElementById('positionYValueMobile');
-    const rotValueMobile = document.getElementById('rotationValueMobile');
-    
-    if (sizeMobile) {
-        sizeMobile.addEventListener('input', (e) => {
-            glassesSize = parseFloat(e.target.value);
-            sizeValueMobile.textContent = Math.round(glassesSize * 100) + '%';
-            sizeSlider.value = glassesSize;
-            sizeValue.textContent = Math.round(glassesSize * 100) + '%';
-            updateGlassesOverlay();
-        });
-    }
-    
-    if (posXMobile) {
-        posXMobile.addEventListener('input', (e) => {
-            glassesPositionX = parseInt(e.target.value);
-            posXValueMobile.textContent = glassesPositionX + 'px';
-            positionXSlider.value = glassesPositionX;
-            positionXValue.textContent = glassesPositionX + 'px';
-            updateGlassesOverlay();
-        });
-    }
-    
-    if (posYMobile) {
-        posYMobile.addEventListener('input', (e) => {
-            glassesPositionY = parseInt(e.target.value);
-            posYValueMobile.textContent = glassesPositionY + 'px';
-            positionYSlider.value = glassesPositionY;
-            positionYValue.textContent = glassesPositionY + 'px';
-            updateGlassesOverlay();
-        });
-    }
-    
-    if (rotMobile) {
-        rotMobile.addEventListener('input', (e) => {
-            glassesRotation = parseInt(e.target.value);
-            rotValueMobile.textContent = glassesRotation + '°';
-            rotationSlider.value = glassesRotation;
-            rotationValue.textContent = glassesRotation + '°';
-            updateGlassesOverlay();
-        });
-    }
-    
-    // Sincronizar valores iniciais
-    if (sizeMobile) sizeMobile.value = glassesSize;
-    if (posXMobile) posXMobile.value = glassesPositionX;
-    if (posYMobile) posYMobile.value = glassesPositionY;
-    if (rotMobile) rotMobile.value = glassesRotation;
     
     // Configurar controles da barra lateral
     setupSideControls();
@@ -225,29 +151,55 @@ function setupMobileControls() {
 // Configurar controles da barra lateral mobile
 function setupSideControls() {
     const isMobile = window.innerWidth <= 768;
-    const sideControls = document.getElementById('mobileSideControls');
+    const toggleBtn = document.getElementById('mobileControlsToggleBtn');
+    const panel = document.getElementById('mobileControlsPanel');
+    const closeBtn = document.getElementById('closePanelBtn');
     
-    if (!sideControls) return;
+    if (!toggleBtn || !panel) return;
     
-    // Mostrar apenas no mobile
+    // Mostrar botão apenas no mobile
     if (isMobile) {
-        sideControls.style.display = 'flex';
+        toggleBtn.style.display = 'flex';
     } else {
-        sideControls.style.display = 'none';
+        toggleBtn.style.display = 'none';
+        panel.classList.remove('active');
         return;
     }
+    
+    // Toggle do painel
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.classList.toggle('active');
+    });
+    
+    // Fechar painel
+    if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            panel.classList.remove('active');
+        });
+    }
+    
+    // Fechar ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (panel.classList.contains('active') && 
+            !panel.contains(e.target) && 
+            !toggleBtn.contains(e.target)) {
+            panel.classList.remove('active');
+        }
+    });
     
     // Botões de tamanho
     const sizeDownBtn = document.getElementById('sizeDownBtn');
     const sizeUpBtn = document.getElementById('sizeUpBtn');
-    const sideSizeValue = document.getElementById('sideSizeValue');
+    const panelSizeValue = document.getElementById('panelSizeValue');
     
     if (sizeDownBtn) {
         sizeDownBtn.addEventListener('click', () => {
             glassesSize = Math.max(0.3, glassesSize - 0.1);
             sizeSlider.value = glassesSize;
             sizeValue.textContent = Math.round(glassesSize * 100) + '%';
-            if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            if (panelSizeValue) panelSizeValue.textContent = Math.round(glassesSize * 100) + '%';
             syncMobileControls();
             updateGlassesOverlay();
         });
@@ -258,7 +210,7 @@ function setupSideControls() {
             glassesSize = Math.min(3, glassesSize + 0.1);
             sizeSlider.value = glassesSize;
             sizeValue.textContent = Math.round(glassesSize * 100) + '%';
-            if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            if (panelSizeValue) panelSizeValue.textContent = Math.round(glassesSize * 100) + '%';
             syncMobileControls();
             updateGlassesOverlay();
         });
@@ -315,14 +267,14 @@ function setupSideControls() {
     // Botões de rotação
     const rotateLeftBtn = document.getElementById('rotateLeftBtn');
     const rotateRightBtn = document.getElementById('rotateRightBtn');
-    const sideRotValue = document.getElementById('sideRotValue');
+    const panelRotValue = document.getElementById('panelRotValue');
     
     if (rotateLeftBtn) {
         rotateLeftBtn.addEventListener('click', () => {
             glassesRotation = Math.max(-180, glassesRotation - 5);
             rotationSlider.value = glassesRotation;
             rotationValue.textContent = glassesRotation + '°';
-            if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+            if (panelRotValue) panelRotValue.textContent = glassesRotation + '°';
             syncMobileControls();
             updateGlassesOverlay();
         });
@@ -333,22 +285,22 @@ function setupSideControls() {
             glassesRotation = Math.min(180, glassesRotation + 5);
             rotationSlider.value = glassesRotation;
             rotationValue.textContent = glassesRotation + '°';
-            if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+            if (panelRotValue) panelRotValue.textContent = glassesRotation + '°';
             syncMobileControls();
             updateGlassesOverlay();
         });
     }
     
     // Atualizar valores iniciais
-    if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
-    if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+    if (panelSizeValue) panelSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+    if (panelRotValue) panelRotValue.textContent = glassesRotation + '°';
     
     // Sincronizar quando valores mudarem via syncMobileControls
     const originalSync = syncMobileControls;
     window.syncMobileControls = function() {
         originalSync();
-        if (sideSizeValue) sideSizeValue.textContent = Math.round(glassesSize * 100) + '%';
-        if (sideRotValue) sideRotValue.textContent = glassesRotation + '°';
+        if (panelSizeValue) panelSizeValue.textContent = Math.round(glassesSize * 100) + '%';
+        if (panelRotValue) panelRotValue.textContent = glassesRotation + '°';
     };
 }
 

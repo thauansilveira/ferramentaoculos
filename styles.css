@@ -226,56 +226,150 @@ main {
     pointer-events: auto;
 }
 
-/* Barra lateral de controles mobile */
-.mobile-side-controls {
+/* Botão flutuante de controles mobile - estilo Photoshop */
+.mobile-controls-toggle-btn {
     position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 12px 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #D8A763 0%, #c8964f 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(216, 167, 99, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    cursor: pointer;
     display: none;
-    flex-direction: column;
-    gap: 16px;
-    border: 1px solid rgba(216, 167, 99, 0.3);
-    min-width: 70px;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
 }
 
-.side-control-group {
+.mobile-controls-toggle-btn:active {
+    transform: scale(0.9);
+}
+
+.toggle-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.mobile-controls-panel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 280px;
+    max-height: 400px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(216, 167, 99, 0.2);
+    z-index: 99;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(216, 167, 99, 0.25);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-controls-panel.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(216, 167, 99, 0.15);
+    background: linear-gradient(135deg, #FFF6EB 0%, #FAD2E1 100%);
+}
+
+.panel-header span {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #5a4a3a;
+    letter-spacing: 0.3px;
+}
+
+.panel-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(216, 167, 99, 0.2);
+    color: #5a4a3a;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.panel-close:active {
+    background: #D8A763;
+    color: white;
+    transform: scale(0.9);
+}
+
+.panel-content {
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.panel-control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.panel-label-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
-.side-control-group label {
-    font-size: 0.7em;
-    color: #5a4a3a;
+.panel-label-row label {
+    font-size: 0.75em;
     font-weight: 600;
+    color: #5a4a3a;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.side-control-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-    width: 100%;
+.panel-value {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #D8A763;
+    min-width: 50px;
+    text-align: right;
 }
 
-.side-btn {
-    width: 40px;
+.panel-buttons-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.panel-btn {
+    flex: 1;
     height: 40px;
     border-radius: 10px;
     border: 1.5px solid #D1B5A7;
     background: #E9D3C6;
     color: #4B3B33;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -285,41 +379,50 @@ main {
     box-shadow: 0 2px 6px rgba(216, 167, 99, 0.15);
 }
 
-.side-btn:active {
+.panel-btn:active {
     transform: scale(0.95);
     background: #D8A763;
     color: white;
     border-color: #D8A763;
 }
 
-.side-value {
-    font-size: 0.75em;
-    color: #D8A763;
-    font-weight: 600;
-    min-height: 20px;
-    text-align: center;
+.panel-arrows-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    max-width: 120px;
+    margin: 0 auto;
 }
 
-.side-control-arrows {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: center;
+.panel-arrows-grid #moveUpBtn {
+    grid-column: 2;
+    grid-row: 1;
 }
 
-.side-arrows-horizontal {
-    display: flex;
-    gap: 4px;
+.panel-arrows-grid #moveLeftBtn {
+    grid-column: 1;
+    grid-row: 2;
 }
 
-.side-arrow-btn {
-    width: 36px;
-    height: 36px;
+.panel-arrows-grid #moveRightBtn {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.panel-arrows-grid #moveDownBtn {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.panel-arrow-btn {
+    width: 38px;
+    height: 38px;
     border-radius: 8px;
     border: 1.5px solid #D1B5A7;
     background: #E9D3C6;
     color: #4B3B33;
-    font-size: 1.1em;
+    font-size: 1em;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -328,7 +431,7 @@ main {
     box-shadow: 0 2px 6px rgba(216, 167, 99, 0.15);
 }
 
-.side-arrow-btn:active {
+.panel-arrow-btn:active {
     transform: scale(0.95);
     background: #D8A763;
     color: white;
@@ -937,37 +1040,39 @@ label.btn {
         position: relative;
     }
     
-    .mobile-side-controls {
+    .mobile-controls-toggle-btn {
         display: flex !important;
-        right: 8px;
-        padding: 10px 6px;
-        min-width: 60px;
+        width: 44px;
+        height: 44px;
+        bottom: 16px;
+        right: 16px;
+    }
+    
+    .mobile-controls-panel {
+        width: 260px;
+        max-height: 350px;
+        bottom: 70px;
+        right: 16px;
+    }
+    
+    .panel-content {
+        padding: 12px;
         gap: 12px;
     }
     
-    .side-control-group {
-        gap: 6px;
-    }
-    
-    .side-control-group label {
-        font-size: 0.65em;
-    }
-    
-    .side-btn {
-        width: 36px;
+    .panel-btn {
         height: 36px;
         font-size: 1em;
     }
     
-    .side-arrow-btn {
-        width: 32px;
-        height: 32px;
+    .panel-arrow-btn {
+        width: 34px;
+        height: 34px;
         font-size: 0.9em;
     }
     
-    .side-value {
-        font-size: 0.7em;
-        min-height: 18px;
+    .panel-arrows-grid {
+        max-width: 110px;
     }
 
     .instructions-box {
