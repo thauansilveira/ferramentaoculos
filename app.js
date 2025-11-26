@@ -160,44 +160,63 @@ function setupMobileControls() {
     const posYValueMobile = document.getElementById('positionYValueMobile');
     const rotValueMobile = document.getElementById('rotationValueMobile');
     
+    // Configurar event listeners para controles mobile
     if (sizeMobile) {
-        sizeMobile.addEventListener('input', (e) => {
+        // Remover listener anterior se existir
+        if (sizeMobile._mobileHandler) {
+            sizeMobile.removeEventListener('input', sizeMobile._mobileHandler);
+        }
+        // Criar novo handler
+        sizeMobile._mobileHandler = function(e) {
             glassesSize = parseFloat(e.target.value);
-            sizeValueMobile.textContent = Math.round(glassesSize * 100) + '%';
-            sizeSlider.value = glassesSize;
-            sizeValue.textContent = Math.round(glassesSize * 100) + '%';
+            if (sizeValueMobile) sizeValueMobile.textContent = Math.round(glassesSize * 100) + '%';
+            if (sizeSlider) sizeSlider.value = glassesSize;
+            if (sizeValue) sizeValue.textContent = Math.round(glassesSize * 100) + '%';
             updateGlassesOverlay();
-        });
+        };
+        sizeMobile.addEventListener('input', sizeMobile._mobileHandler);
     }
     
     if (posXMobile) {
-        posXMobile.addEventListener('input', (e) => {
+        if (posXMobile._mobileHandler) {
+            posXMobile.removeEventListener('input', posXMobile._mobileHandler);
+        }
+        posXMobile._mobileHandler = function(e) {
             glassesPositionX = parseInt(e.target.value);
-            posXValueMobile.textContent = glassesPositionX + 'px';
-            positionXSlider.value = glassesPositionX;
-            positionXValue.textContent = glassesPositionX + 'px';
+            if (posXValueMobile) posXValueMobile.textContent = glassesPositionX + 'px';
+            if (positionXSlider) positionXSlider.value = glassesPositionX;
+            if (positionXValue) positionXValue.textContent = glassesPositionX + 'px';
             updateGlassesOverlay();
-        });
+        };
+        posXMobile.addEventListener('input', posXMobile._mobileHandler);
     }
     
     if (posYMobile) {
-        posYMobile.addEventListener('input', (e) => {
+        if (posYMobile._mobileHandler) {
+            posYMobile.removeEventListener('input', posYMobile._mobileHandler);
+        }
+        posYMobile._mobileHandler = function(e) {
             glassesPositionY = parseInt(e.target.value);
-            posYValueMobile.textContent = glassesPositionY + 'px';
-            positionYSlider.value = glassesPositionY;
-            positionYValue.textContent = glassesPositionY + 'px';
+            if (posYValueMobile) posYValueMobile.textContent = glassesPositionY + 'px';
+            if (positionYSlider) positionYSlider.value = glassesPositionY;
+            if (positionYValue) positionYValue.textContent = glassesPositionY + 'px';
             updateGlassesOverlay();
-        });
+        };
+        posYMobile.addEventListener('input', posYMobile._mobileHandler);
     }
     
     if (rotMobile) {
-        rotMobile.addEventListener('input', (e) => {
+        if (rotMobile._mobileHandler) {
+            rotMobile.removeEventListener('input', rotMobile._mobileHandler);
+        }
+        rotMobile._mobileHandler = function(e) {
             glassesRotation = parseInt(e.target.value);
-            rotValueMobile.textContent = glassesRotation + '°';
-            rotationSlider.value = glassesRotation;
-            rotationValue.textContent = glassesRotation + '°';
+            if (rotValueMobile) rotValueMobile.textContent = glassesRotation + '°';
+            if (rotationSlider) rotationSlider.value = glassesRotation;
+            if (rotationValue) rotationValue.textContent = glassesRotation + '°';
             updateGlassesOverlay();
-        });
+        };
+        rotMobile.addEventListener('input', rotMobile._mobileHandler);
     }
     
     // Sincronizar valores iniciais
@@ -210,21 +229,31 @@ function setupMobileControls() {
     const originalSync = window.syncMobileControls || function() {};
     window.syncMobileControls = function() {
         originalSync();
-        if (sizeMobile) {
-            sizeMobile.value = glassesSize;
-            if (sizeValueMobile) sizeValueMobile.textContent = Math.round(glassesSize * 100) + '%';
+        // Buscar elementos novamente para garantir referência atualizada
+        const sizeMobileSync = document.getElementById('glassesSizeMobile');
+        const posXMobileSync = document.getElementById('glassesPositionXMobile');
+        const posYMobileSync = document.getElementById('glassesPositionYMobile');
+        const rotMobileSync = document.getElementById('glassesRotationMobile');
+        const sizeValueMobileSync = document.getElementById('sizeValueMobile');
+        const posXValueMobileSync = document.getElementById('positionXValueMobile');
+        const posYValueMobileSync = document.getElementById('positionYValueMobile');
+        const rotValueMobileSync = document.getElementById('rotationValueMobile');
+        
+        if (sizeMobileSync) {
+            sizeMobileSync.value = glassesSize;
+            if (sizeValueMobileSync) sizeValueMobileSync.textContent = Math.round(glassesSize * 100) + '%';
         }
-        if (posXMobile) {
-            posXMobile.value = glassesPositionX;
-            if (posXValueMobile) posXValueMobile.textContent = glassesPositionX + 'px';
+        if (posXMobileSync) {
+            posXMobileSync.value = glassesPositionX;
+            if (posXValueMobileSync) posXValueMobileSync.textContent = glassesPositionX + 'px';
         }
-        if (posYMobile) {
-            posYMobile.value = glassesPositionY;
-            if (posYValueMobile) posYValueMobile.textContent = glassesPositionY + 'px';
+        if (posYMobileSync) {
+            posYMobileSync.value = glassesPositionY;
+            if (posYValueMobileSync) posYValueMobileSync.textContent = glassesPositionY + 'px';
         }
-        if (rotMobile) {
-            rotMobile.value = glassesRotation;
-            if (rotValueMobile) rotValueMobile.textContent = glassesRotation + '°';
+        if (rotMobileSync) {
+            rotMobileSync.value = glassesRotation;
+            if (rotValueMobileSync) rotValueMobileSync.textContent = glassesRotation + '°';
         }
     };
     
@@ -309,7 +338,13 @@ function removeGlassesFromImage() {
 // Atualizar overlay dos óculos
 function updateGlassesOverlay() {
     if (!currentGlasses) {
-        overlay.innerHTML = '';
+        if (overlay) overlay.innerHTML = '';
+        return;
+    }
+    
+    // Garantir que overlay existe
+    if (!overlay) {
+        console.warn('Overlay não encontrado');
         return;
     }
     
@@ -335,13 +370,23 @@ function updateGlassesOverlay() {
         setupDragAndDrop(img);
     }
     
-    // Atualizar transformação
-    img.style.transform = `
-        scale(${glassesSize})
-        translate(${glassesPositionX}px, ${glassesPositionY}px)
-        rotate(${glassesRotation}deg)
-    `;
+    // Garantir que a imagem está visível
+    img.style.display = 'block';
+    img.style.visibility = 'visible';
+    img.style.opacity = '1';
+    
+    // Atualizar transformação - garantir que os valores são números válidos
+    const size = typeof glassesSize === 'number' && !isNaN(glassesSize) ? glassesSize : 1;
+    const posX = typeof glassesPositionX === 'number' && !isNaN(glassesPositionX) ? glassesPositionX : 0;
+    const posY = typeof glassesPositionY === 'number' && !isNaN(glassesPositionY) ? glassesPositionY : 0;
+    const rot = typeof glassesRotation === 'number' && !isNaN(glassesRotation) ? glassesRotation : 0;
+    
+    // Aplicar transformação diretamente
+    img.style.transform = `scale(${size}) translate(${posX}px, ${posY}px) rotate(${rot}deg)`;
     img.style.transition = isDragging ? 'none' : 'transform 0.1s ease';
+    
+    // Forçar reflow para garantir que a transformação seja aplicada
+    void img.offsetHeight;
 }
 
 // Configurar arrastar e soltar
